@@ -128,6 +128,7 @@ INSERT INTO lineorder (
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
+        csv_schema = "lo_orderkey:int;lo_linenumber:int;lo_custkey:int;lo_partkey:int;lo_suppkey:int;lo_orderdate:int;lo_orderpriority:string;lo_shippriority:int;lo_quantity:int;lo_extendedprice:int;lo_ordtotalprice:int;lo_discount:int;lo_revenue:int;lo_supplycost:int;lo_tax:int;lo_commitdate:int;lo_shipmode:STRING",
         "compress_type"="gz"
 );
 
@@ -138,6 +139,7 @@ INSERT INTO customer (
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
+        csv_schema = "c_custkey:int;c_name:string;c_address:string;c_city:string;c_nation:string;c_region:string;c_phone:string;c_mktsegment:string",
         "compress_type"="gz"
 );
 
@@ -148,6 +150,7 @@ INSERT INTO dates (
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
+        csv_schema = "d_datekey:int;d_date:string;d_dayofweek:string;d_month:string;d_year:int;d_yearmonthnum:int;d_yearmonth:string;d_daynuminweek:int;d_daynuminmonth:int;d_daynuminyear:int;d_monthnuminyear:int;d_weeknuminyear:int;d_sellingseason:string;d_lastdayinweekfl:int;d_lastdayinmonthfl:int;d_holidayfl:int;d_weekdayfl:int",
         "compress_type"="gz"
 );
 
@@ -159,6 +162,7 @@ SELECT * FROM S3 (
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
+        csv_schema = "s_suppkey:int;s_name:string;s_address:string;s_city:string;s_nation:string;s_region:string;s_phone:string",
         "compress_type"="gz"
 );
 
@@ -170,6 +174,7 @@ SELECT * FROM S3 (
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
+        csv_schema = "p_partkey:int;p_name:string;p_mfgr:string;p_category:string;p_brand:string;p_color:string;p_type:string;p_size:int;p_container:string",
         "compress_type"="gz"
 );
 

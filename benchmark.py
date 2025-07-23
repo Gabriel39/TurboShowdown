@@ -108,7 +108,7 @@ def execute_snowflake_sql(props, sql):
 
 
 def execute_doris_sql(props, sql, default_db=False):
-    command = ["mysql", "-h%s" % props.get('FE_HOST'), "-P%s" % props.get('FE_QUERY_PORT'), "-u%s" % props.get('USER'),
+    command = ["mysql", "-h", props.get('FE_HOST'), "-P", props.get('FE_QUERY_PORT'), "-u%s" % props.get('USER'),
                "-e", sql, "-vvv"]
     if not props.get('PASSWORD').strip() == '':
         command.append("-p%s" % props.get('PASSWORD'))

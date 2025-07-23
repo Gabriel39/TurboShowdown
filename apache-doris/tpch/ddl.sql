@@ -157,7 +157,8 @@ SELECT l_orderkey, l_partkey, l_suppkey, l_linenumber, l_quantity, l_extendedpri
         "uri" = "s3://redshift-downloads/TPC-H/2.18/100GB/lineitem/*",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
-        FORMAT = "CSV"
+        FORMAT = "CSV",
+        csv_schema = "l_orderkey:bigint;l_partkey:int;l_suppkey:int;l_linenumber:int;l_quantity:decimal(15, 2);l_extendedprice:decimal(15, 2);l_discount:decimal(15, 2);l_tax:decimal(15, 2);l_returnflag:STRING;l_linestatus:STRING;l_shipdate:DATE;l_commitdate:DATE;l_receiptdate:DATE;l_shipinstruct:STRING;l_shipmode:STRING;l_comment:STRING"
 );
 
 INSERT INTO orders (
@@ -167,7 +168,8 @@ SELECT o_orderkey, o_custkey, o_orderstatus, o_totalprice, o_orderdate, o_orderp
         "uri" = "s3://redshift-downloads/TPC-H/2.18/100GB/orders/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
-        "column_separator" = "|"
+        "column_separator" = "|",
+        csv_schema = "o_orderkey:bigint;o_custkey:int;o_orderstatus:STRING;o_totalprice:decimal(15, 2);o_orderdate:date;o_orderpriority:STRING;o_clerk:STRING;o_shippriority:INT;o_comment:STRING"
 );
 
 INSERT INTO partsupp SELECT * FROM S3 (
