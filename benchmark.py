@@ -39,7 +39,9 @@ def extract_exec_time(output, target):
         return total_seconds
     elif target == 'snowflake':
         match = re.search(r"Time Elapsed:\s*([0-9.]+)s", output.stdout)
-        return match.group(1).strip('s') if match else None
+        if not match:
+            print(output)
+        return match.group(1).strip('s') if match else -1.0
     elif target == 'clickhouse':
         return output.stderr.strip()
     return None
@@ -52,7 +54,7 @@ def get_result_file(target, benchmark, suffix):
     return f"{result_dir}/result_{target}_{benchmark}_{suffix}.csv"
 
 
-def execute_sql_file(props, target, benchmark, type, thread, queue):
+def execute_sql_file(props, target, benchmark, type, thread, queue, env):
     sql_file = '%s/%s/%s.sql' % (target, benchmark, type)
     with open(sql_file, "r") as file:
         queries = [query.strip() for query in file.read().split(";\n") if query.strip()]
@@ -62,7 +64,7 @@ def execute_sql_file(props, target, benchmark, type, thread, queue):
     with open(result_file_path, "w") as result_file:
         for index, sql in enumerate(queries):
             try:
-                output = execute_sql(target, props, sql)
+                output = execute_sql(target, props, sql, False, env)
                 time_elapsed = extract_exec_time(output, target)
                 print(
                     f"Thread {thread} executing SQL: {index}-th SQL in file {result_file_path}\n\t"
@@ -77,31 +79,33 @@ def execute_sql_file(props, target, benchmark, type, thread, queue):
         queue.put(sql_time_list)
 
 
-def execute_sql(target, props, sql, default_db=False):
+def execute_sql(target, props, sql, default_db=False, env=None):
+    if env is None:
+        env = {}
     if target == 'apache-doris':
         return execute_doris_sql(props, sql, default_db)
     elif target == 'snowflake':
-        return execute_snowflake_sql(props, sql)
+        return execute_snowflake_sql(props, sql, default_db, env)
     elif target == 'clickhouse':
         return execute_clickhouse_sql(props, sql, default_db)
     return None
 
 
-def execute_snowflake_sql(props, sql):
+def execute_snowflake_sql(props, sql, default_db=False, env=None):
     command = [
         "snowsql",
-        "--warehouse",
-        props.get('WAREHOUSE'),
-        "--schemaname",
-        "PUBLIC",
-        "--dbname",
-        props.get('DB'),
         "-q",
         sql,
     ]
 
+    for item in props.keys():
+        if default_db and item == 'DBNAME':
+            continue
+        command.append(f'--{item.lower()}')
+        command.append(props[item])
+
     try:
-        result = subprocess.run(command, text=True, capture_output=True, check=True)
+        result = subprocess.run(command, text=True, capture_output=True, check=True, env=env)
         return result
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"snowsql command failed: {e.stderr}")
@@ -145,13 +149,18 @@ def execute_clickhouse_sql(props, sql, default_db=False):
     return result
 
 
-def execute_ddl(target, props):
+def execute_ddl(target, props, env):
     """Set up the database by dropping and creating it."""
-    drop_query = f"DROP DATABASE IF EXISTS {props.get('DB')}"
-    create_query = f"CREATE DATABASE {props.get('DB')}"
-    execute_sql(target, props, drop_query, True)
-    execute_sql(target, props, create_query, True)
-    print(f"Database '{props.get('DB')}' has been set up.")
+    db = ''
+    if target == 'snowflake':
+        db = props.get('DBNAME')
+    else:
+        db = props.get('DB')
+    drop_query = f"DROP DATABASE IF EXISTS {db}"
+    create_query = f"CREATE DATABASE {db}"
+    execute_sql(target, props, drop_query, True, env)
+    execute_sql(target, props, create_query, True, env)
+    print(f"Database '{db}' has been set up.")
 
 
 def parse_arguments():
@@ -184,6 +193,7 @@ def main():
     sql_time_avg = {}
     categories = []
     for target in args.target:
+        env = {}
         conf_file = f'properties/{target}.properties'
         if not os.path.exists(conf_file):
             print("Configuration file not found: %s." % conf_file)
@@ -192,15 +202,22 @@ def main():
         if not os.path.exists('%s/%s' % (target, args.benchmark)):
             print("Path not found: %s/%s." % (target, args.benchmark))
             sys.exit(1)
+        if target == 'snowflake':
+            if 'PASSWORD' not in prop:
+                print('PASSWORD should be set !')
+                sys.exit(1)
+            env["SNOWSQL_PWD"] = prop["PASSWORD"]
+            prop.pop("PASSWORD")
+            execute_sql(target, prop, 'ALTER ACCOUNT SET USE_CACHED_RESULT=FALSE;', True, env)
         if args.load:
-            execute_ddl(target, prop)
-            execute_sql_file(prop, target, args.benchmark, 'ddl', 0, None)
+            execute_ddl(target, prop, env)
+            execute_sql_file(prop, target, args.benchmark, 'ddl', 0, None, env)
         if args.run:
             processes = []
             queue = multiprocessing.Queue()
             for i in range(args.parallelism):
                 p = multiprocessing.Process(target=execute_sql_file,
-                                            args=(prop, target, args.benchmark, 'queries', i, queue))
+                                            args=(prop, target, args.benchmark, 'queries', i, queue, env))
                 processes.append(p)
                 p.start()
             for p in processes:

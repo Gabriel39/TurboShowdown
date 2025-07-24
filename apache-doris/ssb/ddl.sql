@@ -124,7 +124,7 @@ PROPERTIES (
 INSERT INTO lineorder (
     lo_orderkey,lo_linenumber,lo_custkey,lo_partkey,lo_suppkey,lo_orderdate,lo_orderpriority,lo_shippriority,lo_quantity,lo_extendedprice,lo_ordtotalprice,lo_discount,lo_revenue,lo_supplycost,lo_tax,lo_commitdate,lo_shipmode
 ) SELECT * FROM S3 (
-        "uri" = "s3://bench-dataset/ssb/sf100/lineorder*",
+        "uri" = "s3://bench-dataset/ssb/sf100/lineorder/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
@@ -135,7 +135,7 @@ INSERT INTO lineorder (
 INSERT INTO customer (
     c_custkey,c_name,c_address,c_city,c_nation,c_region,c_phone,c_mktsegment
 )SELECT * FROM S3 (
-        "uri" = "s3://bench-dataset/ssb/sf100/customer.tbl.gz",
+        "uri" = "s3://bench-dataset/ssb/sf100/customer/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
@@ -146,7 +146,7 @@ INSERT INTO customer (
 INSERT INTO dates (
     d_datekey,d_date,d_dayofweek,d_month,d_year,d_yearmonthnum,d_yearmonth,d_daynuminweek,d_daynuminmonth,d_daynuminyear,d_monthnuminyear,d_weeknuminyear,d_sellingseason,d_lastdayinweekfl,d_lastdayinmonthfl,d_holidayfl,d_weekdayfl
 ) SELECT * FROM S3 (
-        "uri" = "s3://bench-dataset/ssb/sf100/date.tbl.gz",
+        "uri" = "s3://bench-dataset/ssb/sf100/date/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
@@ -158,7 +158,7 @@ INSERT INTO supplier (
     s_suppkey,s_name,s_address,s_city,s_nation,s_region,s_phone
 )
 SELECT * FROM S3 (
-        "uri" = "s3://bench-dataset/ssb/sf100/supplier.tbl.gz",
+        "uri" = "s3://bench-dataset/ssb/sf100/supplier/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",
@@ -170,7 +170,7 @@ INSERT INTO part (
     p_partkey,p_name,p_mfgr,p_category,p_brand,p_color,p_type,p_size,p_container
 )
 SELECT * FROM S3 (
-        "uri" = "s3://bench-dataset/ssb/sf100/part.tbl.gz",
+        "uri" = "s3://bench-dataset/ssb/sf100/part/*",
         "format" = "csv",
         "s3.endpoint" = "https://s3.us-east-1.amazonaws.com",
         "column_separator" = "|",

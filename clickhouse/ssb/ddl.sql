@@ -82,11 +82,11 @@ CREATE OR REPLACE TABLE date
 ENGINE = MergeTree ORDER BY D_DATEKEY;
 
 
-INSERT INTO lineorder SELECT * FROM s3('s3://bench-dataset/ssb/sf100/lineorder*.gz', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
-INSERT INTO customer SELECT * FROM s3('s3://bench-dataset/ssb/sf100/customer.tbl.gz', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
-INSERT INTO date SELECT * FROM s3('s3://bench-dataset/ssb/sf100/date.tbl.gz', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
-INSERT INTO supplier SELECT * FROM s3('s3://bench-dataset/ssb/sf100/supplier.tbl.gz', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
-INSERT INTO part SELECT * FROM s3('s3://bench-dataset/ssb/sf100/part.tbl.gz', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
+INSERT INTO lineorder SELECT * FROM s3('s3://bench-dataset/ssb/sf100/lineorder/*', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
+INSERT INTO customer SELECT * FROM s3('s3://bench-dataset/ssb/sf100/customer/*', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
+INSERT INTO date SELECT * FROM s3('s3://bench-dataset/ssb/sf100/date/*', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
+INSERT INTO supplier SELECT * FROM s3('s3://bench-dataset/ssb/sf100/supplier/*', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
+INSERT INTO part SELECT * FROM s3('s3://bench-dataset/ssb/sf100/part/*', NOSIGN, CSV) SETTINGS format_csv_delimiter = '|', input_format_defaults_for_omitted_fields = 1, input_format_csv_empty_as_default = 1;
 
 
 CREATE OR REPLACE TABLE lineorder_flat
