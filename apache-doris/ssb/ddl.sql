@@ -178,6 +178,8 @@ SELECT * FROM S3 (
         "compress_type"="gz"
 );
 
+analyze database ssb with full with sync;
+
 drop table if exists lineorder_flat;
 CREATE TABLE IF NOT EXISTS `lineorder_flat` (
     `LO_ORDERDATE` int(11) NOT NULL COMMENT "",
@@ -281,3 +283,4 @@ FROM lineorder AS l
         INNER JOIN customer AS c ON c.C_CUSTKEY = l.LO_CUSTKEY
         INNER JOIN supplier AS s ON s.S_SUPPKEY = l.LO_SUPPKEY
         INNER JOIN part AS p ON p.P_PARTKEY = l.LO_PARTKEY;
+analyze table lineorder_flat with full with sync;

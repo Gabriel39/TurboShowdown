@@ -119,3 +119,5 @@ SELECT * FROM S3 (
         "column_separator" = "\\t",
         "trim_double_quotes" = "true"
 );
+
+analyze database clickbench with full with sync;
